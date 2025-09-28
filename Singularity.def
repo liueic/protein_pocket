@@ -22,29 +22,12 @@ From: continuumio/miniconda3:latest
         tar \
         gzip \
         build-essential \
+        libglib2.0-dev \
+        pkg-config \
         && rm -rf /var/lib/apt/lists/*
 
-    # 创建conda环境
-    conda create -n protein-pocket python=3.11 -y
-    
-    # 激活环境并安装依赖
-    . /opt/conda/etc/profile.d/conda.sh
-    conda activate protein-pocket
-    
-    # 安装conda包
-    conda install -c conda-forge -c bioconda -y \
-        fpocket=4.2.2 \
-        openjdk=24.0.2 \
-        numpy \
-        biopython \
-        openbabel
-    
-    # 安装pip包
-    pip install \
-        typer[all] \
-        rich \
-        pydantic \
-        requests
+    # 创建conda环境（使用environment.yml）
+    conda env create -f /tmp/environment.yml
 
     # 下载并安装P2Rank
     cd /opt
@@ -54,7 +37,7 @@ From: continuumio/miniconda3:latest
     chmod +x /opt/p2rank_2.5.1/prank
     
     # 测试P2Rank安装
-    /opt/p2rank_2.5.1/prank --version
+    conda run -n protein-pocket /opt/p2rank_2.5.1/prank --version
 
     # 创建应用目录
     mkdir -p /app
@@ -64,18 +47,16 @@ From: continuumio/miniconda3:latest
 %files
     # 复制项目文件到容器中
     protein_pocket/ /app/protein_pocket/
-    environment.yml /app/
+    environment.yml /tmp/
     test_installation.py /app/
 
 %post
     # 安装项目包
-    . /opt/conda/etc/profile.d/conda.sh
-    conda activate protein-pocket
     cd /app
-    pip install -e protein_pocket/
+    conda run -n protein-pocket pip install -e protein_pocket/
 
     # 测试安装
-    python test_installation.py
+    conda run -n protein-pocket python test_installation.py
 
 %runscript
     # 默认运行脚本

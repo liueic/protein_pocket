@@ -73,7 +73,8 @@ jobs:
           wget \
           pkg-config \
           git \
-          cryptsetup-bin
+          cryptsetup-bin \
+          libglib2.0-dev
         
         # Download and install Singularity
         export VERSION=3.11.4
