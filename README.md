@@ -2,6 +2,11 @@
 
 一个完整的蛋白口袋检测和评估pipeline，集成了fpocket几何预测和P2Rank机器学习重打分，支持单文件和批量处理
 
+引用项目：
+
+- fpocket：https://github.com/Discngine/fpocket
+- P2Rank：https://github.com/rdk/p2rank
+
 ## 系统要求
 
 - Python 3.11+
