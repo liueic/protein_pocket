@@ -68,13 +68,12 @@ EOF
 
 %files
     # 复制项目文件到容器中
-    protein_pocket/ /app/protein_pocket/
-    test_installation.py /app/
+    . /app/
 
 %post
     # 安装项目包
     cd /app
-    conda run -n protein-pocket pip install -e protein_pocket/
+    conda run -n protein-pocket pip install -e ./protein_pocket/
 
     # 测试安装
     conda run -n protein-pocket python test_installation.py
