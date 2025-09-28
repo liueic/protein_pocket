@@ -14,6 +14,12 @@ From: continuumio/miniconda3:latest
     export LC_ALL=C.UTF-8
     export LANG=C.UTF-8
 
+%files
+    # 复制项目文件到容器中
+    protein_pocket/ /app/protein_pocket/
+    environment.yml /tmp/
+    test_installation.py /app/
+
 %post
     # 更新系统包
     apt-get update && apt-get install -y \
@@ -44,13 +50,6 @@ From: continuumio/miniconda3:latest
     mkdir -p /data
     mkdir -p /output
 
-%files
-    # 复制项目文件到容器中
-    protein_pocket/ /app/protein_pocket/
-    environment.yml /tmp/
-    test_installation.py /app/
-
-%post
     # 安装项目包
     cd /app
     conda run -n protein-pocket pip install -e protein_pocket/
