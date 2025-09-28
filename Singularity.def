@@ -14,12 +14,6 @@ From: continuumio/miniconda3:latest
     export LC_ALL=C.UTF-8
     export LANG=C.UTF-8
 
-%files
-    # 复制项目文件到容器中
-    protein_pocket/ /app/protein_pocket/
-    environment.yml /tmp/
-    test_installation.py /app/
-
 %post
     # 更新系统包
     apt-get update && apt-get install -y \
@@ -31,6 +25,28 @@ From: continuumio/miniconda3:latest
         libglib2.0-dev \
         pkg-config \
         && rm -rf /var/lib/apt/lists/*
+
+    # 创建environment.yml文件
+    cat > /tmp/environment.yml << 'EOF'
+name: protein-pocket
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.11
+  - fpocket=4.2.2
+  - openjdk=24.0.2
+  - numpy
+  - biopython
+  - openbabel
+  - pip
+  - pip:
+    - typer[all]
+    - rich
+    - pydantic
+    - requests
+EOF
 
     # 创建conda环境（使用environment.yml）
     conda env create -f /tmp/environment.yml
@@ -50,6 +66,12 @@ From: continuumio/miniconda3:latest
     mkdir -p /data
     mkdir -p /output
 
+%files
+    # 复制项目文件到容器中
+    protein_pocket/ /app/protein_pocket/
+    test_installation.py /app/
+
+%post
     # 安装项目包
     cd /app
     conda run -n protein-pocket pip install -e protein_pocket/
