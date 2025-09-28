@@ -48,7 +48,7 @@ WORKDIR /app/protein_pocket
 RUN conda run -n protein-pocket pip install -e .
 
 # 测试安装
-RUN conda run -n protein-pocket python test_installation.py
+RUN conda run -n protein-pocket python /app/test_installation.py
 
 # 设置默认命令
 ENTRYPOINT ["conda", "run", "-n", "protein-pocket", "protein-pocket"]
