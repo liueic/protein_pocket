@@ -16,14 +16,13 @@ fi
 
 echo "✅ Docker正在运行"
 
-# 选择Dockerfile
-DOCKERFILE="Dockerfile"
-if [ -f "Dockerfile.simple" ]; then
-    echo "📁 找到简化版Dockerfile，使用Dockerfile.simple"
-    DOCKERFILE="Dockerfile.simple"
+# 检查Dockerfile是否存在
+if [ ! -f "Dockerfile" ]; then
+    echo "❌ 错误: 未找到Dockerfile"
+    exit 1
 fi
 
-echo "📦 使用Dockerfile: $DOCKERFILE"
+echo "📁 使用Dockerfile"
 
 # 设置镜像名称
 IMAGE_NAME="protein_pocket_test"
@@ -40,7 +39,7 @@ echo "🚀 开始构建Docker镜像..."
 echo "这可能需要几分钟时间，请耐心等待..."
 
 # 构建镜像
-if docker build -f "$DOCKERFILE" -t "$IMAGE_NAME" .; then
+if docker build -t "$IMAGE_NAME" .; then
     echo ""
     echo "🎉 Docker镜像构建成功!"
     echo "📁 镜像名称: $IMAGE_NAME"
