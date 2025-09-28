@@ -1,0 +1,109 @@
+Bootstrap: docker
+From: continuumio/miniconda3:latest
+
+%labels
+    Author "Aicnal Liueic"
+    Email "liusomes@gmail.com"
+    Version "1.0"
+    Description "Protein pocket detection pipeline with fpocket and P2Rank"
+
+%environment
+    export PATH="/opt/conda/bin:$PATH"
+    export P2RANK_HOME="/opt/p2rank_2.5.1"
+    export PATH="$P2RANK_HOME:$PATH"
+    export LC_ALL=C.UTF-8
+    export LANG=C.UTF-8
+
+%post
+    # 更新系统包
+    apt-get update && apt-get install -y \
+        wget \
+        curl \
+        tar \
+        gzip \
+        build-essential \
+        && rm -rf /var/lib/apt/lists/*
+
+    # 创建conda环境
+    conda create -n protein-pocket python=3.11 -y
+    
+    # 激活环境并安装依赖
+    . /opt/conda/etc/profile.d/conda.sh
+    conda activate protein-pocket
+    
+    # 安装conda包
+    conda install -c conda-forge -c bioconda -y \
+        fpocket=4.2.2 \
+        openjdk=24.0.2 \
+        numpy \
+        biopython \
+        openbabel
+    
+    # 安装pip包
+    pip install \
+        typer[all] \
+        rich \
+        pydantic \
+        requests
+
+    # 下载并安装P2Rank
+    cd /opt
+    wget https://github.com/rdk/p2rank/releases/download/2.5.1/p2rank_2.5.1.tar.gz
+    tar -xzf p2rank_2.5.1.tar.gz
+    rm p2rank_2.5.1.tar.gz
+    chmod +x /opt/p2rank_2.5.1/prank
+    
+    # 测试P2Rank安装
+    /opt/p2rank_2.5.1/prank --version
+
+    # 创建应用目录
+    mkdir -p /app
+    mkdir -p /data
+    mkdir -p /output
+
+%files
+    # 复制项目文件到容器中
+    protein_pocket/ /app/protein_pocket/
+    environment.yml /app/
+    test_installation.py /app/
+
+%post
+    # 安装项目包
+    . /opt/conda/etc/profile.d/conda.sh
+    conda activate protein-pocket
+    cd /app
+    pip install -e protein_pocket/
+
+    # 测试安装
+    python test_installation.py
+
+%runscript
+    # 默认运行脚本
+    . /opt/conda/etc/profile.d/conda.sh
+    conda activate protein-pocket
+    exec protein-pocket "$@"
+
+%help
+    Protein Pocket Detection Pipeline
+    
+    This container provides a complete protein pocket detection pipeline that combines:
+    - fpocket for geometric pocket prediction
+    - P2Rank for machine learning-based rescoring
+    - Custom Python tools for filtering and analysis
+    
+    Usage:
+    # Single file processing
+    singularity run protein_pocket.sif run /data/protein.pdb --workdir /output
+    
+    # Batch processing
+    singularity run protein_pocket.sif batch /data/proteins/ --results-dir /output
+    
+    # Show help
+    singularity run protein_pocket.sif --help
+    
+    Environment Variables:
+    - P2RANK_HOME: Path to P2Rank installation (set to /opt/p2rank_2.5.1)
+    
+    Mount Points:
+    - /data: Input data directory
+    - /output: Output results directory

@@ -1,0 +1,18 @@
+[project]
+name = "protein-pocket"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Aicnal Liueic", email = "liusomes@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+]
+
+[project.scripts]
+protein-pocket = "protein_pocket.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
