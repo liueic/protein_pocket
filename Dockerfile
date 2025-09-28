@@ -1,4 +1,4 @@
-# 稳定的蛋白口袋检测Pipeline Docker容器
+# 蛋白口袋检测Pipeline Docker容器
 FROM continuumio/miniconda3:latest
 
 LABEL maintainer="Aicnal Liueic <liusomes@gmail.com>"
@@ -12,34 +12,20 @@ ENV PATH="$P2RANK_HOME:$PATH"
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
-# 安装系统依赖和Java
+# 安装系统依赖
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
     tar \
     gzip \
     build-essential \
-    openjdk-17-jdk \
     && rm -rf /var/lib/apt/lists/*
 
-# 创建conda环境
-RUN conda create -n protein-pocket python=3.11 -y
+# 复制环境配置文件
+COPY environment.yml /tmp/
 
-# 激活环境并安装依赖 - 分步安装避免超时
-RUN conda run -n protein-pocket conda install -c conda-forge -y \
-    numpy \
-    biopython \
-    openbabel
-
-RUN conda run -n protein-pocket conda install -c bioconda -y \
-    fpocket=4.2.2
-
-# 安装pip包
-RUN conda run -n protein-pocket pip install \
-    typer[all] \
-    rich \
-    pydantic \
-    requests
+# 创建conda环境（使用environment.yml）
+RUN conda env create -f /tmp/environment.yml
 
 # 下载并安装P2Rank
 RUN cd /opt && \
@@ -49,14 +35,13 @@ RUN cd /opt && \
     chmod +x /opt/p2rank_2.5.1/prank
 
 # 测试P2Rank安装
-RUN /opt/p2rank_2.5.1/prank --version
+RUN conda run -n protein-pocket /opt/p2rank_2.5.1/prank --version
 
 # 创建应用目录
 RUN mkdir -p /app /data /output
 
 # 复制项目文件
 COPY protein_pocket/ /app/protein_pocket/
-COPY environment.yml /app/
 COPY test_installation.py /app/
 
 # 安装项目包
