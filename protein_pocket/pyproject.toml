@@ -2,7 +2,7 @@
 name = "protein-pocket"
 version = "0.1.0"
 description = "Add your description here"
-readme = "README.md"
+# readme = "README.md"
 authors = [
     { name = "Aicnal Liueic", email = "liusomes@gmail.com" }
 ]
