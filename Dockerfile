@@ -41,12 +41,11 @@ RUN conda run -n protein-pocket /opt/p2rank_2.5.1/prank --version
 RUN mkdir -p /app /data /output
 
 # 复制项目文件
-COPY protein_pocket/ /app/protein_pocket/
-COPY test_installation.py /app/
+COPY . /app/
 
 # 安装项目包
 WORKDIR /app
-RUN conda run -n protein-pocket pip install -e protein_pocket/
+RUN conda run -n protein-pocket pip install -e ./protein_pocket/
 
 # 测试安装
 RUN conda run -n protein-pocket python test_installation.py
