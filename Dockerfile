@@ -44,8 +44,8 @@ RUN mkdir -p /app /data /output
 COPY . /app/
 
 # 安装项目包
-WORKDIR /app
-RUN conda run -n protein-pocket pip install -e ./protein_pocket/
+WORKDIR /app/protein_pocket
+RUN conda run -n protein-pocket pip install -e .
 
 # 测试安装
 RUN conda run -n protein-pocket python test_installation.py
